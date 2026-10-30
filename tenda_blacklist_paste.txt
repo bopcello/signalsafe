@@ -1,0 +1,43 @@
+================================================================================
+TENDA N301 WEBSITE FILTER / PARENTAL CONTROL BLACKLIST
+================================================================================
+
+FORMAT 1: COMMA-SEPARATED (Copy & Paste this directly into Tenda "Website Filter" box)
+--------------------------------------------------------------------------------
+godaddysites.com,phishbait.net,evil-actor.io,fraudster.xyz,phishing.link,event-registration-desk.online,wifi-login-portal-update.top,djtool-for-spotify.com,ngrok.exe
+
+
+FORMAT 2: FULL DOMAIN LIST (One per line)
+--------------------------------------------------------------------------------
+keraekken-loagginnusa.godaddysites.com
+paypa1-secure-login.phishbait.net
+campus-qr-redirect.evil-actor.io
+netbanking-verify.fraudster.xyz
+ucgrant-form.phishing.link
+event-registration-desk.online
+wifi-login-portal-update.top
+djtool-for-spotify.com
+171.100.81.38
+
+
+FORMAT 3: HIGH-IMPACT KEYWORDS (Tenda Substring Matching — Blocks All Subdomains)
+--------------------------------------------------------------------------------
+phishbait
+evil-actor
+fraudster
+phishing
+godaddysites
+ngrok
+djtool
+
+
+================================================================================
+HOW TO APPLY IN TENDA N301 (http://192.168.0.1):
+1. Open 192.168.0.1 in your browser.
+2. Click "Parental Control" on the left menu.
+3. Find the target device in the list and click "Manage" (or gear icon).
+4. Turn on Parental Control.
+5. Set Website Filter mode to: "Only Forbid".
+6. Paste the line from FORMAT 1 above into the website/URL field.
+7. Click Save / OK.
+================================================================================
