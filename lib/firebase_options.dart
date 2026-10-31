@@ -71,4 +71,5 @@ class DefaultFirebaseOptions {
     authDomain: 'hf2signalsafe.firebaseapp.com',
     storageBucket: 'hf2signalsafe.firebasestorage.app',
   );
+
 }

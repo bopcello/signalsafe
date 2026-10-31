@@ -39,7 +39,7 @@ HTTP_PORT = 80
 FALLBACK_HTTP_PORT = 8080
 
 def get_local_ip():
-    """Detects the machine's local IP on the Tenda / LAN subnet."""
+    """Detects the machine's local IP on the gateway / LAN subnet."""
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
         s.connect(('8.8.8.8', 80))
@@ -357,9 +357,8 @@ def main():
     load_dataset()
     print("-" * 72)
     print(f"[*] Gateway Local IP:   {LOCAL_IP}")
-    print(f"[*] Mendeley Dataset:   {len(BLOCKED_DOMAINS):,} Phishing Domains Armed")
-    print("[*] To route Wi-Fi clients: In Tenda N301 (192.168.0.1) -> DHCP Server,")
-    print(f"    set Primary DNS to: {LOCAL_IP}")
+    print(f"[*] To route VPN clients: Configure DNS in client profile to:")
+    print(f"    {LOCAL_IP} or WireGuard gateway subnet")
     print("=" * 72)
 
     # Start DNS server thread

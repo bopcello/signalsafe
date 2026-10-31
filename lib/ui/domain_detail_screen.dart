@@ -203,7 +203,7 @@ class _DomainDetailScreenState extends State<DomainDetailScreen> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
-                          domain.isActive ? 'ROUTER BLACKLIST: ENFORCED' : 'OVERRIDDEN ALLOWLIST',
+                          domain.isActive ? 'VPN DNS BLOCK: ENFORCED' : 'OVERRIDDEN ALLOWLIST',
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w800,
@@ -320,7 +320,7 @@ class _DomainDetailScreenState extends State<DomainDetailScreen> {
                                       SnackBar(
                                         backgroundColor: AppColors.threatRed,
                                         content: Text(
-                                          'Domain Blocked: ${domain.domain} added to active router blacklist.',
+                                          'Domain Blocked: ${domain.domain} added to active VPN DNS blocklist.',
                                           style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                                         ),
                                       ),

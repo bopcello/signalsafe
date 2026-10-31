@@ -2,7 +2,7 @@ class AuditLogEntry {
   final String id;
   final String actorUid;
   final String actorRole;
-  final String action; // "confirmed_block" | "allowed" | "manual_add" | "sync_router"
+  final String action; // "confirmed_block" | "allowed" | "manual_add" | "sync_vpn"
   final String targetDomain;
   final String details;
   final DateTime timestamp;

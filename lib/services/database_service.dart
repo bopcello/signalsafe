@@ -26,7 +26,7 @@ class DashboardStats {
 
 /// SignalSafe Database & Realtime State Service
 /// Manages Firestore operations and provides an embedded real-time reactive
-/// store for offline hackathon demos, router sync, and atomic batch reviews.
+/// store for offline hackathon demos, VPN sync, and atomic batch reviews.
 class DatabaseService {
   static final DatabaseService _instance = DatabaseService._internal();
   factory DatabaseService() => _instance;
@@ -361,13 +361,13 @@ class DatabaseService {
     _notifyAll();
   }
 
-  /// Register Interstitial Block Event (written when client hits fallback interstitial or router blocks)
+  /// Register a DNS Block Event (written when Pi-hole blocks a VPN client or the interstitial page fires)
   Future<void> logBlockEvent(String domain, {String? clientIp, String? userAgent}) async {
     final event = BlockEvent(
       id: _uuid.v4(),
       domain: domain,
-      clientIp: clientIp ?? '192.168.0.104',
-      userAgent: userAgent ?? 'Campus-WiFi Client',
+      clientIp: clientIp ?? '10.8.0.2',
+      userAgent: userAgent ?? 'Pi-hole DNS Block (gravity)',
       createdAt: DateTime.now(),
     );
     _blockEvents.insert(0, event);
@@ -381,7 +381,7 @@ class DatabaseService {
     _notifyAll();
   }
 
-  /// Export active blacklist in plain text format for Tenda N301 Parental Control -> Website Filter
+  /// Export active blocklist as plain domain-per-line format for Pi-hole adlist
   String exportBlacklistAsText() {
     final active = activeBlacklist.map((e) => e.domain).toList()..sort();
     return active.join('\n');

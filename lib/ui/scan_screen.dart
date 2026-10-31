@@ -99,7 +99,7 @@ class _ScanScreenState extends State<ScanScreen> {
         SnackBar(
           backgroundColor: AppColors.threatRed,
           content: Text(
-            'Enforced router block on ${r.domain}! Added to active blacklist.',
+            'Enforced DNS block on ${r.domain}! Added to active blocklist.',
             style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
         ),
@@ -342,7 +342,7 @@ class _ScanScreenState extends State<ScanScreen> {
                         ),
                         const SizedBox(height: 4),
                         const Text(
-                          'Point your phone camera at this QR code while connected to the Tenda N301 WiFi network to test network-level blocking in real time.',
+                          'Point your phone camera at this QR code with the SignalSafe VPN active to test DNS-level blocking in real time.',
                           style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
                         ),
                         const SizedBox(height: 6),

@@ -72,7 +72,7 @@ class ScoringService {
         features: featuresMap,
         reasons: [
           'Active Campus Blacklist: This domain was previously confirmed malicious and is blocked by IT Security.',
-          'Gateway Policy: Domain flagged in Tenda router parental controls and network firewall.',
+          'Gateway Policy: Domain flagged in Pi-hole DNS sinkhole and campus VPN gateway firewall.',
         ],
         inferenceTimeMs: stopwatch.elapsedMilliseconds,
       );

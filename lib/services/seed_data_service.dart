@@ -13,9 +13,9 @@ import 'database_service.dart';
 /// 1. Admin users & Student users
 /// 2. Active Blacklist entries with full lexical feature breakdowns
 /// 3. Pending & Triaged Scan Reports (SecOps Triage Queue)
-/// 4. Interstitial Block Events (Tenda N301 & WiFi defense triggers)
+/// 4. Interstitial Block Events (DNS sinkhole & VPN defense triggers)
 /// 5. Immutable Audit Log entries (human IT override authority records)
-/// 6. Active Campus DHCP Clients (Tenda N301 client table)
+/// 6. Active Campus VPN Clients
 ///
 /// Both updates the in-memory reactive DatabaseService immediately AND
 /// writes into Cloud Firestore when an authenticated or authorized session is active.
@@ -68,55 +68,48 @@ class SeedDataService {
     ),
   ];
 
-  /// Realistic DHCP clients representing students and staff connected to Tenda N301
+  /// Realistic VPN client peers representing students and test devices
   static final List<DhcpClient> sampleDhcpClients = [
     DhcpClient(
-      ip: '192.168.0.102',
-      mac: 'F4:D1:08:92:B1:A4',
-      hostName: 'Aarav-iPhone-14',
-      leaseTime: '23h 48m',
-      isFlagged: false,
-    ),
-    DhcpClient(
-      ip: '192.168.0.104',
-      mac: '7C:2E:BD:41:88:F9',
+      ip: '10.8.0.2',
+      mac: 'WG-PEER-01',
       hostName: 'Judge-Phone-TestDevice',
-      leaseTime: '23h 59m',
+      leaseTime: 'VPN Tunnel',
       isFlagged: true, // Intercepted threat simulation device
     ),
     DhcpClient(
-      ip: '192.168.0.105',
-      mac: 'A0:C5:89:12:33:DE',
+      ip: '10.8.0.3',
+      mac: 'WG-PEER-02',
+      hostName: 'Aarav-iPhone-14',
+      leaseTime: 'VPN Tunnel',
+      isFlagged: false,
+    ),
+    DhcpClient(
+      ip: '10.8.0.4',
+      mac: 'WG-PEER-03',
       hostName: 'Sneha-MacBook-Air',
-      leaseTime: '21h 14m',
+      leaseTime: 'VPN Tunnel',
       isFlagged: false,
     ),
     DhcpClient(
-      ip: '192.168.0.108',
-      mac: 'B8:27:EB:77:4A:91',
-      hostName: 'RaspberryPi-DNS-Edge',
-      leaseTime: 'Static Lease',
-      isFlagged: false,
-    ),
-    DhcpClient(
-      ip: '192.168.0.112',
-      mac: '44:65:0D:5F:AA:C2',
+      ip: '10.8.0.5',
+      mac: 'WG-PEER-04',
       hostName: 'Vikram-OnePlus-11',
-      leaseTime: '18h 32m',
+      leaseTime: 'VPN Tunnel',
       isFlagged: false,
     ),
     DhcpClient(
-      ip: '192.168.0.119',
-      mac: 'E0:CB:EE:94:01:5D',
+      ip: '10.8.0.6',
+      mac: 'WG-PEER-05',
       hostName: 'Library-Kiosk-Terminal-03',
-      leaseTime: 'Static Lease',
+      leaseTime: 'VPN Tunnel',
       isFlagged: false,
     ),
     DhcpClient(
-      ip: '192.168.0.125',
-      mac: 'D8:3B:BF:6C:54:19',
+      ip: '10.8.0.7',
+      mac: 'WG-PEER-06',
       hostName: 'Lab-Workstation-CS204',
-      leaseTime: 'Static Lease',
+      leaseTime: 'VPN Tunnel',
       isFlagged: false,
     ),
   ];
@@ -150,7 +143,7 @@ class SeedDataService {
       'source': 'auto',
       'reviewedBy': 'admin_ananya_secops',
       'auditAction': 'confirmed_block',
-      'auditDetails': 'Physical QR code sticker found pasted over campus cafeteria payment kiosk. Block enforced router-wide.',
+      'auditDetails': 'Physical QR code sticker found pasted over campus cafeteria payment kiosk. Block enforced VPN-wide via Pi-hole DNS sinkhole.',
       'hoursAgo': 28,
     },
     {
@@ -165,7 +158,7 @@ class SeedDataService {
       'source': 'auto',
       'reviewedBy': 'admin_rajesh_sharma',
       'auditAction': 'confirmed_block',
-      'auditDetails': 'Quishing campaign targeting student portal SSO credentials. Automated router blacklist propagation.',
+      'auditDetails': 'Quishing campaign targeting student portal SSO credentials. Automated VPN blocklist propagation.',
       'hoursAgo': 20,
     },
     {

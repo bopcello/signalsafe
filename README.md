@@ -6,7 +6,7 @@
 
 ## 🌟 Executive Summary
 
-SignalSafe blocks malicious domains, credential harvesters, and quishing (QR-code phishing) attempts network-wide on campus WiFi without requiring students to install apps or security profiles. Built on real network infrastructure (Tenda N301 WISP mode), decisions are evaluated locally on-device in under 1 millisecond and governed by an IT Admin console with atomic batch human overrides and append-only audit trails.
+SignalSafe blocks malicious domains, credential harvesters, and quishing (QR-code phishing) attempts device-wide. Students install the lightweight SignalSafe app, which establishes a local VPN profile on their device. All DNS queries are filtered through the SignalSafe VPN gateway (Pi-hole DNS sinkhole with 101k blocked domains + WireGuard secure tunnel), preventing deceptive sites from loading before the browser ever connects. Decisions are evaluated locally on-device in under 1 millisecond and governed by an IT Admin console with atomic batch human overrides and append-only audit trails.
 
 ---
 
@@ -30,27 +30,24 @@ Trained on the Mendeley LegitPhish dataset (101,218 valid samples, 16 lexical an
 ## 🏗️ System Architecture
 
 ```
-[Judge / Student Phone]
+[Student Device]
+      │  (Installs SignalSafe App)
+      ▼  (Creates Local VPN Profile on device)
+[SignalSafe VPN & DNS Gateway]
+      ├── Pi-hole (Docker)          ← DNS blocker for 101k malicious domains
+      ├── WireGuard / wg-easy       ← VPN server; tunnels device DNS queries
+      └── SignalSafe Console        ← Flutter console + ML scoring engine
       │
-      ▼  (Zero-install WiFi association)
-[Tenda N301 Router, WISP Mode]
-      ├── Hardware Website Filter Blacklist (synced pre-demo from NetWatch export)
-      └── DHCP Client Pool Table (live connected-device visibility)
-      │
-      ▼  (Wireless Uplink)
-[Dedicated 4G/5G Hotspot / MiFi]
-      │
-      ▼
-   Internet
+      ▼  (Gateway uplink)
+[Campus Uplink / MiFi  ──►  Internet]
 
-[SignalSafe NetWatch Console] (Windows Desktop / Web / Android)
+[SignalSafe Console] (Windows Desktop / Web / Android)
       ├── assets/model.json (50-tree compact Random Forest)
       ├── assets/tld_popularity.json (TLD reputation map)
       ├── lib/scoring/feature_extractor.dart (16 lexical features computed offline)
       ├── lib/scoring/forest.dart (On-device decision tree evaluator)
       ├── lib/scoring/reasoning.dart (Plain-language IT explanation derivation)
-      ├── lib/services/database_service.dart (Atomic review batch transactions & reactive streams)
-      └── lib/services/export_service.dart (Tenda N301 plain text blacklist generator)
+      └── lib/services/database_service.dart (Atomic review batch transactions & reactive streams)
 
 [Hosted Interstitial Fallback Page] (Firebase Hosting / Local)
       └── Renders "Blocked by SignalSafe" interstitial and logs anonymous block_events
@@ -60,9 +57,10 @@ Trained on the Mendeley LegitPhish dataset (101,218 valid samples, 16 lexical an
 
 ## 🎯 The Three Core Features
 
-1. **Network-Wide Blocking:**
-   - Any malicious link or QR scam scored against the 16-feature vector is blocked at the physical router level for all devices on the network.
-   - Requires zero software installation on student or guest devices.
+1. **App-Driven Local VPN + DNS Protection:**
+   - Students install the SignalSafe app, which sets up a local VPN profile on the device.
+   - All device DNS requests are automatically routed through the SignalSafe VPN gateway running Pi-hole (101k malicious domains from Mendeley LegitPhish).
+   - Zero router hardware dependencies — high performance, real-time protection across any Wi-Fi network or cellular connection.
 
 2. **SecOps Review Queue & Human Override:**
    - Every automated detection enters a human-in-the-loop triage queue with plain-language reasoning.
@@ -70,7 +68,7 @@ Trained on the Mendeley LegitPhish dataset (101,218 valid samples, 16 lexical an
    - Enforced by an atomic batch transaction updating reports, blacklists, and append-only audit trails simultaneously.
 
 3. **Flutter NetWatch Console (Windows & Mobile):**
-   - Live telemetry dashboard featuring active blocked domains, pending reviews, interstitial hits, and connected DHCP client visibility.
+   - Live telemetry dashboard featuring active blocked domains, pending reviews, interstitial hits, and Pi-hole query log feed.
    - Interactive QR code generator for live physical testing with judging phones.
 
 ---

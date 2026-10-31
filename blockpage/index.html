@@ -1,0 +1,72 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b1220">
+<title>Blocked by SignalSafe</title>
+<style>
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: #0b1220;
+    color: #e5edf8;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+.card {
+    width: 100%;
+    max-width: 560px;
+    padding: 38px;
+    border: 1px solid #26354b;
+    border-radius: 20px;
+    background: #111c2e;
+    box-shadow: 0 24px 70px #0005;
+}
+.brand {
+    color: #64e6bd;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 3px;
+}
+.icon {
+    display: grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    margin: 30px 0 22px;
+    border-radius: 18px;
+    background: #54212b;
+    color: #ff8996;
+    font-size: 32px;
+}
+h1 { margin: 0 0 14px; font-size: 30px; }
+p { color: #aabbd0; line-height: 1.7; }
+.notice {
+    margin-top: 26px;
+    padding: 16px;
+    border-left: 3px solid #64e6bd;
+    background: #18283a;
+    color: #d5e5f5;
+    line-height: 1.6;
+}
+footer { margin-top: 28px; color: #71849e; font-size: 12px; }
+</style>
+</head>
+<body>
+<main class="card">
+    <div class="brand">SIGNALSAFE</div>
+    <div class="icon" aria-hidden="true">&#9888;</div>
+    <h1>Access blocked</h1>
+    <p>SignalSafe prevented this connection because the requested domain appears on the configured security blocklist.</p>
+    <div class="notice">
+        <strong>Your safety matters.</strong><br>
+        Do not enter passwords, payment details, or personal information on a suspicious website.
+    </div>
+    <footer>SignalSafe &bull; Network Protection</footer>
+</main>
+</body>
+</html>

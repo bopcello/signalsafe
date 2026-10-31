@@ -1,7 +1,7 @@
 /// SignalSafe User Model
 /// By default, all registered users are Students (isAdmin = false).
 /// Flipping `isAdmin: true` in the database grants full IT Admin authority
-/// to manually allow or block any domain, review triage queues, and sync routers.
+/// to manually allow or block any domain, review triage queues, and sync VPN gateway policies.
 class AppUser {
   final String uid;
   final String email;

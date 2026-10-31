@@ -12,7 +12,12 @@
           "package_name": "com.example.signalsafe"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "561380928332-3jskec56b7t5p5lvvsn7s0equirrbst2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyB-N6ND731pBEbf4Nh2s2LEOXRjJXE-icM"
@@ -20,7 +25,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "561380928332-3jskec56b7t5p5lvvsn7s0equirrbst2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

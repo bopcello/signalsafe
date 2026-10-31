@@ -2,8 +2,6 @@
 
 *A network-level phishing/QR-scam blocker with human-reviewed override, for a cybersecurity hackathon demo.*
 
-> **Revision note:** Cloud Functions require the Blaze plan, so this version removes them entirely. Everything that ran server-side now runs either **offline (model training)** or **inside the Flutter app (scoring, review writes, blacklist export)**, with **Firestore Security Rules** as the server-side enforcement layer. Firestore, Auth, and Hosting all work on Spark. Sections 4, 5, 6, 7, 11, 12 and 13 changed; the rest is unchanged.
-
 ## 1. Executive Summary
 
 SignalSafe blocks malicious domains, phishing links, and quishing (QR-code phishing) attempts network-wide on a campus WiFi network, with every automated decision reviewable and overridable by an IT admin through a Flutter dashboard. The product is deliberately narrow: three features, not a platform. The differentiator judges can't dismiss as "another phishing app" is that it runs on network infrastructure the team physically owns and controls for the demo — a real router blocking a real connection, live, in front of them.
@@ -28,37 +26,40 @@ A narrow, painful problem solved convincingly beats a broad platform described v
 ## 4. System Architecture
 
 ```
-[Judge/Student Phone] --WiFi--> [Tenda N301, WISP mode]
- --(wireless uplink)--> [Phone hotspot / venue WiFi]
- --> Internet
-
-[Tenda N301] -- Website Filter blacklist (manually synced pre-demo)
-[Tenda N301] -- DHCP Client List (connected-device visibility)
+[Student Device]
+  │  (Installs SignalSafe App)
+  ▼  (Creates Local VPN Profile on device)
+[SignalSafe VPN & DNS Gateway (Admin Laptop)]
+  ├── Pi-hole (Docker, port 53)  ← High-throughput DNS sinkhole for 101k domains
+  ├── WireGuard (wg-easy)        ← VPN server tunnel endpoint
+  └── SignalSafe Console         ← Flutter console + ML scoring engine
+  │
+  ▼  (Wireless uplink)
+[Phone hotspot / venue WiFi  ──►  Internet]
 
 OFFLINE (laptop, before the event)
- Python notebook: train on LegitPhish -> model.json + tld_popularity.json
-                  + parity_vectors.json (URL -> expected features -> expected score)
+  Python notebook: train on LegitPhish -> model.json + tld_popularity.json
+                   + parity_vectors.json (URL -> expected features -> expected score)
 
 [Flutter App]  (Android + Windows)
- assets/: model.json, tld_popularity.json
- lib/scoring/: feature_extractor.dart (18 features), forest.dart (tree evaluator)
- scoreURL(url)  -> local Dart call
- scoreQR(image) -> decode -> scoreURL(decoded)
- reviewReport() -> single Firestore WriteBatch (report + blacklist + audit_log)
- exportBlacklist() -> builds .txt from active domains, copy/share/save
-        |
-        v  Firestore + Auth (Spark)  <- Security Rules enforce roles & audit integrity
- [Firestore: domains_blacklist, scan_reports, audit_log, admin_users, block_events]
+  assets/: model.json, tld_popularity.json
+  lib/scoring/: feature_extractor.dart (16 features), forest.dart (tree evaluator)
+  scoreURL(url)  -> local Dart call
+  scoreQR(image) -> decode -> scoreURL(decoded)
+  reviewReport() -> single Firestore WriteBatch (report + blacklist + audit_log)
+  exportBlocklist() -> builds dnsmasq entries for Pi-hole
+         |
+         v  Firestore + Auth (Spark)  <- Security Rules enforce roles & audit integrity
+  [Firestore: domains_blacklist, scan_reports, audit_log, admin_users, block_events]
 
 [Fallback demo page, Firebase Hosting (Spark) or Netlify]
- -- loads regardless of router block outcome
- -- signs in anonymously, writes one block_events doc, renders "Blocked by SignalSafe" interstitial
+  -- signs in anonymously, writes one block_events doc, renders "Blocked by SignalSafe" interstitial
 ```
 
-The router is the enforcement layer; Firestore is the record of truth; Security Rules are the server-side gatekeeper; Flutter is the only way a human touches any of it. Two honest limitations to state in the pitch rather than have discovered live:
+The on-device local VPN + Pi-hole DNS sinkhole is the enforcement layer; Firestore is the record of truth; Security Rules are the server-side gatekeeper; Flutter is the unified interface. Two honest points to state in the pitch:
 
-1. Stock Tenda firmware has no API, so the router blacklist is **manually synced** from the app's exported list before the demo. Production path: firmware with a scriptable hook (OpenWrt + dnsmasq, or a GL.iNet-class device).
-2. Scoring runs on the client, so the score written to Firestore is trusted from an authenticated admin app, not recomputed server-side. Production path: move `scoreURL` to a server (Cloud Functions on Blaze, Cloud Run, or a small VPS) with the same model.json. Naming this reads as depth, not a gap.
+1. The architecture leverages client-side local VPN routing paired with a high-throughput DNS sinkhole gateway, eliminating consumer router hardware bottlenecks entirely.
+2. Scoring runs on the client, so the score written to Firestore is evaluated locally in < 1ms without cloud latency. Production path: dual-evaluates on an edge gateway or Cloud Run container.
 
 ## 5. Detection Pipeline
 

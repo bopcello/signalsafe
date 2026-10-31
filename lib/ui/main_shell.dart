@@ -4,7 +4,8 @@ import '../models/admin_user.dart';
 import '../models/scan_report.dart';
 import '../services/auth_service.dart';
 import '../services/database_service.dart';
-import '../services/export_service.dart';
+import '../services/local_vpn_service.dart';
+
 import '../theme/app_theme.dart';
 import 'auth_screen.dart';
 import 'dashboard_screen.dart';
@@ -133,7 +134,7 @@ class _MainShellState extends State<MainShell> {
                           Expanded(
                             child: Text(
                               newStatus
-                                  ? 'Unlocked IT ADMIN Mode! "Router Gateway" & "Review Queue" now visible in sidebar.'
+                                  ? 'Unlocked IT ADMIN Mode! "VPN Gateway" & "Review Queue" now visible in sidebar.'
                                   : 'Switched to STUDENT mode.',
                               style: TextStyle(
                                 color: newStatus ? Colors.black : Colors.white,
@@ -148,7 +149,7 @@ class _MainShellState extends State<MainShell> {
                 }
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: isAdmin
                       ? AppColors.cyberCyan.withValues(alpha: 0.15)
@@ -166,23 +167,21 @@ class _MainShellState extends State<MainShell> {
                       isAdmin
                           ? Icons.admin_panel_settings_rounded
                           : Icons.school_rounded,
-                      size: 13,
-                      color: isAdmin
-                          ? AppColors.cyberCyan
-                          : AppColors.textSecondary,
+                      size: 12,
+                      color: AppColors.cyberCyan,
                     ),
-                    const SizedBox(width: 5),
+                    const SizedBox(width: 4),
                     Text(
-                      isAdmin ? 'IT ADMIN (CLICK TO SWITCH)' : 'STUDENT (CLICK FOR ADMIN)',
-                      style: TextStyle(
+                      isAdmin ? 'IT ADMIN' : 'STUDENT',
+                      style: const TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 0.5,
-                        color: isAdmin
-                          ? AppColors.cyberCyan
-                          : AppColors.cyberCyan,
+                        color: AppColors.cyberCyan,
                       ),
                     ),
+                    const SizedBox(width: 3),
+                    const Icon(Icons.swap_vert_rounded, size: 12, color: AppColors.cyberCyan),
                   ],
                 ),
               ),
@@ -191,65 +190,68 @@ class _MainShellState extends State<MainShell> {
         ],
       ),
       actions: [
-        // Live Router Status Pill (Visible on Desktop)
-        if (screenWidth >= 760)
-          Container(
-            margin: const EdgeInsets.symmetric(vertical: 10),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: AppColors.borderHighlight),
-            ),
-            child: const Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.circle, size: 8, color: AppColors.verifiedGreen),
-                SizedBox(width: 6),
-                Text(
-                  'Tenda N301 WISP Active',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+        // Live VPN Gateway Status Pill (Responsive)
+        AnimatedBuilder(
+          animation: LocalVpnService(),
+          builder: (context, _) {
+            final isVpnRunning = LocalVpnService().isRunning;
+            if (screenWidth < 760) {
+              return IconButton(
+                tooltip: isVpnRunning ? 'Local VPN Active' : 'Local VPN Inactive',
+                icon: Icon(
+                  Icons.vpn_lock_rounded,
+                  size: 20,
+                  color: isVpnRunning ? AppColors.verifiedGreen : AppColors.textMuted,
                 ),
-              ],
-            ),
-          ),
-        const SizedBox(width: 8),
-
-        // Quick Export Blacklist (Only enabled for Admins)
-        if (isAdmin)
-          IconButton(
-            tooltip: 'Quick Copy Router Blacklist',
-            icon: const Icon(
-              Icons.file_upload_outlined,
-              color: AppColors.cyberCyan,
-            ),
-            onPressed: () async {
-              await ExportService.copyToClipboard();
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    backgroundColor: AppColors.verifiedGreen,
-                    content: Text(
-                      'Router Blacklist copied to clipboard!',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                onPressed: () {
+                  setState(() => _currentIndex = 4);
+                },
+              );
+            }
+            return InkWell(
+              onTap: () => setState(() => _currentIndex = 4),
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                margin: const EdgeInsets.symmetric(vertical: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: isVpnRunning ? AppColors.verifiedGreen : AppColors.borderHighlight,
                   ),
-                );
-              }
-            },
-          ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.circle,
+                      size: 8,
+                      color: isVpnRunning ? AppColors.verifiedGreen : AppColors.warningAmber,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      isVpnRunning ? 'Local VPN Active' : 'Local VPN Inactive',
+                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
         const SizedBox(width: 8),
 
-        // User Account & Database Boolean Flip Inspector
+        // User Account pill — compact on mobile
         InkWell(
           onTap: () => _showUserRoleModal(context, user, isAdmin),
           borderRadius: BorderRadius.circular(12),
           child: Container(
             margin: const EdgeInsets.symmetric(vertical: 8),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: EdgeInsets.symmetric(
+              horizontal: screenWidth < 760 ? 8 : 12,
+              vertical: 6,
+            ),
             decoration: BoxDecoration(
               color: AppColors.surfaceElevated,
               borderRadius: BorderRadius.circular(10),
@@ -258,35 +260,41 @@ class _MainShellState extends State<MainShell> {
               ),
             ),
             child: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
                   isAdmin
                       ? Icons.admin_panel_settings_rounded
                       : Icons.person_rounded,
-                  size: 16,
+                  size: 15,
                   color: isAdmin
                       ? AppColors.cyberCyan
                       : AppColors.textSecondary,
                 ),
-                const SizedBox(width: 8),
-                Text(
-                  user.displayName.split(' ').first,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
+                const SizedBox(width: 6),
+                ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: screenWidth < 760 ? 60 : 100),
+                  child: Text(
+                    user.displayName.split(' ').first,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
-                const SizedBox(width: 4),
+                const SizedBox(width: 2),
                 const Icon(
                   Icons.keyboard_arrow_down_rounded,
-                  size: 16,
+                  size: 15,
                   color: AppColors.textMuted,
                 ),
               ],
             ),
           ),
         ),
-        const SizedBox(width: 16),
+        const SizedBox(width: 12),
       ],
     );
   }
@@ -481,7 +489,7 @@ class _MainShellState extends State<MainShell> {
               ),
               subtitle: Text(
                 isAdmin
-                    ? 'Full authority: review queue, manual allow/block, router sync'
+                    ? 'Full authority: review queue, manual allow/block, VPN gateway'
                     : 'Restricted student view: threat scanning and personal submissions',
                 style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
               ),
@@ -595,9 +603,9 @@ class _MainShellState extends State<MainShell> {
                 label: Text('Governance'),
               ),
               const NavigationRailDestination(
-                icon: Icon(Icons.router_outlined),
-                selectedIcon: Icon(Icons.router_rounded),
-                label: Text('Router Gateway'),
+                icon: Icon(Icons.vpn_lock_outlined),
+                selectedIcon: Icon(Icons.vpn_lock_rounded),
+                label: Text('VPN Gateway'),
               ),
             ],
           );
@@ -684,12 +692,12 @@ class _MainShellState extends State<MainShell> {
             label: 'Domains',
           ),
           NavigationDestination(
-            icon: Icon(Icons.router_outlined),
+            icon: Icon(Icons.vpn_lock_outlined),
             selectedIcon: Icon(
-              Icons.router_rounded,
+              Icons.vpn_lock_rounded,
               color: AppColors.cyberCyan,
             ),
-            label: 'Router Gateway',
+            label: 'VPN Gateway',
           ),
         ],
       );
@@ -800,7 +808,7 @@ class _MainShellState extends State<MainShell> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Connected to SignalSafe Protected WiFi',
+                        'Connected to SignalSafe Protected Network',
                         style: TextStyle(
                           fontWeight: FontWeight.w800,
                           fontSize: 18,
@@ -808,7 +816,7 @@ class _MainShellState extends State<MainShell> {
                       ),
                       SizedBox(height: 4),
                       Text(
-                        'Your device is shielded by Tenda N301 hardware filtering. Known phishing domains, credential harvesters, and malicious QR links are blocked automatically at the router gateway.',
+                        'The SignalSafe app has established a local VPN profile on your device. Known phishing domains, credential harvesters, and malicious QR links are blocked at the DNS level through the SignalSafe VPN gateway before your browser ever connects.',
                         style: TextStyle(
                           fontSize: 13,
                           color: AppColors.textSecondary,
@@ -852,7 +860,7 @@ class _MainShellState extends State<MainShell> {
             icon: Icons.report_problem_rounded,
             title: 'Report Suspicious Sites to IT Head',
             body:
-                'Found a deceptive email link? Scan it and tap "Report to IT Head" to flag it for the campus-wide router blacklist.',
+                'Found a deceptive email link? Scan it and tap "Report to IT Head" to flag it for campus-wide Pi-hole DNS blocking.',
           ),
         ],
       ),

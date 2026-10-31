@@ -43,11 +43,11 @@ class DashboardScreen extends StatelessWidget {
                       _buildMetricCard(
                         title: 'BLOCKED DOMAINS',
                         value: stats.totalBlockedDomains.toString(),
-                        subtitle: 'Active router blacklist',
+                        subtitle: 'Active Pi-hole blocklist',
                         icon: Icons.block_rounded,
                         accentColor: AppColors.threatRed,
-                        badgeText: 'NETWORK ENFORCED',
-                        onTap: () => onNavigateTab(4), // Blacklist
+                        badgeText: 'DNS ENFORCED',
+                        onTap: () => onNavigateTab(4),
                       ),
                       _buildMetricCard(
                         title: 'PENDING REVIEWS',
@@ -68,13 +68,13 @@ class DashboardScreen extends StatelessWidget {
                         onTap: () {},
                       ),
                       _buildMetricCard(
-                        title: 'CAMPUS CLIENTS',
+                        title: 'VPN CLIENTS',
                         value: stats.activeNetworkClients.toString(),
-                        subtitle: 'Tenda N301 DHCP pool',
-                        icon: Icons.devices_rounded,
+                        subtitle: 'WireGuard tunnel peers',
+                        icon: Icons.vpn_lock_rounded,
                         accentColor: AppColors.verifiedGreen,
-                        badgeText: 'WISP ACTIVE',
-                        onTap: () => onNavigateTab(4), // Network screen
+                        badgeText: 'VPN ACTIVE',
+                        onTap: () => onNavigateTab(4),
                       ),
                     ],
                   );
@@ -146,7 +146,7 @@ class DashboardScreen extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      'Tenda N301 WISP Gateway',
+                      'Pi-hole + WireGuard VPN Gateway',
                       style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
                     ),
                     SizedBox(width: 10),
@@ -165,7 +165,7 @@ class DashboardScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 2),
                 Text(
-                  'Uplink: Dedicated MiFi Hotspot • DNS/SNI Filter: Enforced • Subnet: 192.168.0.0/24',
+                  'Pi-hole DNS sinkhole: 101k blocked domains • WireGuard VPN: all device traffic tunnelled • Subnet: 10.8.0.0/24',
                   style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
                 ),
               ],

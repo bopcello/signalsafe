@@ -337,7 +337,7 @@ class _ReviewQueueScreenState extends State<ReviewQueueScreen> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 backgroundColor: AppColors.threatRed,
-                                content: Text('Confirmed Block: ${r.domain} added to router blacklist. Audit log committed.'),
+                                content: Text('Confirmed Block: ${r.domain} added to VPN DNS blocklist. Audit log committed.'),
                               ),
                             );
                           }
